@@ -1,14 +1,20 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Rate Sender
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+  <form #rsForm="ngForm" autocomplete="off">
+    <ion-item>
+      <ion-label floating>Buyer</ion-label>
+      <ion-input type="text" [readonly]="true" (click)="selectBuyer()"></ion-input>      
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Seller</ion-label>
+      <ion-input type="text" [readonly]="true" (click)="selectSeller()"></ion-input>
+    </ion-item>
+  </form>
 </ion-content>

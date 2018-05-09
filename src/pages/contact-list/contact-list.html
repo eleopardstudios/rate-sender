@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-navbar primary>
+    <ion-buttons start>
+      <button ion-button icon-only (click)="closeModal()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>
+      {{title}}
+    </ion-title>
+    <ion-buttons end></ion-buttons>
+  </ion-navbar>
+  <ion-searchbar [(ngModel)]="searchString" (ionInput)="findContacts($event)"></ion-searchbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <button ion-item *ngFor="let contact of contactsFound" (click)="selectContact(contact)" detail-none>
+      {{contact.displayName}}
+    </button>
+  </ion-list>
+</ion-content>
