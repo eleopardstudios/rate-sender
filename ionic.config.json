@@ -1,6 +1,6 @@
 {
   "name": "rate-sender",
-  "app_id": "",
+  "app_id": "f5f269e7",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}
