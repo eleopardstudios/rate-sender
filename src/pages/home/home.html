@@ -7,14 +7,51 @@
 </ion-header>
 
 <ion-content padding>
-  <form #rsForm="ngForm" autocomplete="off">
+  <ion-grid text-center>
+    <ion-row>
+      <ion-col col-6>
+        <button ion-button (click)="selectBuyer()" [disabled]="data.buyer != null">Select Buyer</button>
+      </ion-col>
+      <ion-col col-6>
+        <button ion-button (click)="selectSeller()" [disabled]="data.seller != null">Select Seller</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-card>
+    <ion-item>
+      <h2>
+        <strong>Buyer</strong>
+      </h2>
+      <button ion-button clear item-end icon-only>
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-card-content>
+      <h2>Shobhit Agrawal</h2>
+      <h3>9876543210</h3>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-item>
+      <h2>
+        <strong>Seller</strong>
+      </h2>
+      <button ion-button clear item-end icon-only>
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-card-content>
+      <h2>Shobhit Agrawal</h2>
+      <h3>9876543210</h3>
+    </ion-card-content>
+  </ion-card>
     <ion-item>
       <ion-label floating>Buyer</ion-label>
-      <ion-input type="text" [readonly]="true" (click)="selectBuyer()"></ion-input>      
+      <ion-input type="text" [readonly]="true" (click)="selectBuyer()"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label floating>Seller</ion-label>
       <ion-input type="text" [readonly]="true" (click)="selectSeller()"></ion-input>
     </ion-item>
-  </form>
+  
 </ion-content>

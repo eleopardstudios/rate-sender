@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Platform, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ModalController } from 'ionic-angular';
+import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/contacts';
 
 
 @Component({
@@ -9,6 +10,7 @@ import { ModalController } from 'ionic-angular';
 })
 export class HomePage {
   private isWeb: boolean;
+  private contactList = [];
   data: any = {
     buyer : null,
     seller: null,
@@ -18,7 +20,11 @@ export class HomePage {
     date: null
   };
 
-  constructor(public navCtrl: NavController, public platform: Platform, public modalCtrl: ModalController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, 
+    public platform: Platform, 
+    public modalCtrl: ModalController, 
+    public navParams: NavParams,
+    private contacts: Contacts) {
 
   }
 
@@ -30,9 +36,28 @@ export class HomePage {
     });
   }
 
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad ContactListPage');
+    if (this.isWeb) {
+      console.log("On Web");
+      return;
+    }
+    let fields: ContactFieldType[] = ['displayName'];
+    const options = new ContactFindOptions();
+    options.filter = "";//To fetch all the contacts
+    options.multiple = true;
+    options.hasPhoneNumber = true;
+    this.contacts.find(fields, options).then((contacts) => {
+      console.log("contacts fetched");
+      this.contactList = contacts;
+      console.log(JSON.stringify(contacts[0]));
+    });    
+  }
+
   selectSeller() {
     let obj = {
-      'title': 'Select Seller'      
+      'title': 'Select Seller',
+      'contactList': this.contactList
     };
     let contactsModal = this.modalCtrl.create('ContactListPage', obj);
     contactsModal.onDidDismiss((option) => {
@@ -45,7 +70,8 @@ export class HomePage {
 
   selectBuyer() {
     let obj = {
-      'title': 'Select Buyer'      
+      'title': 'Select Buyer',
+      'contactList': this.contactList    
     };
     let contactsModal = this.modalCtrl.create('ContactListPage', obj);
     contactsModal.onDidDismiss((option) => {

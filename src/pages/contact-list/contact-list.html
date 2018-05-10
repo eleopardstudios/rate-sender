@@ -14,7 +14,7 @@
 </ion-header>
 <ion-content>
   <ion-list>
-    <button ion-item *ngFor="let contact of contactsFound" (click)="selectContact(contact)" detail-none>
+    <button ion-item *ngFor="let contact of contactList" (click)="selectContact(contact)" detail-none>
       {{contact.displayName}}
     </button>
   </ion-list>

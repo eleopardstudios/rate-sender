@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ViewController } from 'ionic-angular';
-import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/contacts';
 
 @IonicPage()
 @Component({
@@ -10,17 +9,16 @@ import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/co
 })
 export class ContactListPage {
   private title: string;
+  private contactList = [];
   private isWeb: boolean;
-  private searchString: string;
-  private contactsFound = [];
+  private searchString: string;  
   private search = false;
+
 
   constructor(public navCtrl: NavController,
     public platform: Platform,
     public navParams: NavParams,
-    public viewCtrl: ViewController,
-    private contacts: Contacts) {
-
+    public viewCtrl: ViewController) {
   }
 
   ngOnInit() {
@@ -35,6 +33,7 @@ export class ContactListPage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad ContactListPage');
     this.title = this.navParams.get("title");
+    this.contactList = this.navParams.get("contactList");
   }
 
   closeModal() {
@@ -43,27 +42,5 @@ export class ContactListPage {
 
   selectContact(contact) {
     this.viewCtrl.dismiss(contact);
-  }
-
-
-  findContacts($event) {
-    if (this.isWeb) {
-      console.log("On Web");
-      return;
-    }
-    let fields: ContactFieldType[] = ['displayName'];
-    const options = new ContactFindOptions();
-    options.filter = this.searchString;
-    options.multiple = true;
-    options.hasPhoneNumber = true;
-
-    this.contacts.find(fields, options).then((contacts) => {
-      this.contactsFound = contacts;
-      console.log(JSON.stringify(contacts[0]));
-    });
-    if (this.contactsFound.length == 0) {
-      this.contactsFound.push({ displayName: 'No Contacts found' });
-    }
-    this.search = true;
-  }
+  } 
 }
