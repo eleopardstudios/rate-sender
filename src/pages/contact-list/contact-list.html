@@ -10,12 +10,17 @@
     </ion-title>
     <ion-buttons end></ion-buttons>
   </ion-navbar>
-  <ion-searchbar [(ngModel)]="searchString" (ionInput)="findContacts($event)"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchTerm" [formControl]="searchControl"></ion-searchbar>
 </ion-header>
 <ion-content>
-  <ion-list>
-    <button ion-item *ngFor="let contact of contactList" (click)="selectContact(contact)" detail-none>
+  <ion-list [virtualScroll]="filteredContacts">
+    <button ion-item *virtualItem="let contact" (click)="selectContact(contact)" detail-none>
       {{contact.displayName}}
     </button>
   </ion-list>
+  <ion-fab right bottom>
+    <button ion-fab color="primary" icon-only (click)="refresh()">
+        <ion-icon name="refresh"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>
