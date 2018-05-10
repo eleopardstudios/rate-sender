@@ -1,105 +1,25 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>
-      Rate Sender
-    </ion-title>
+    <ion-title>Home</ion-title>
+    <ion-buttons end>
+        <button ion-button menuToggle icon-only>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
-
 <ion-content padding>
-  <ion-grid text-center>
-    <ion-row>
-      <ion-col col-6>
-        <button ion-button (click)="selectBuyer()">Select Buyer</button>
-      </ion-col>
-      <ion-col col-6>
-        <button ion-button (click)="selectSeller()">Select Seller</button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <ion-card>
-    <ion-item>
-      <h2>
-        <strong>Buyer</strong>
-      </h2>
-      <button ion-button clear item-end icon-only (click)="removeBuyer()" *ngIf="data.buyer != null">
-        <ion-icon name="trash"></ion-icon>
+    <ion-card margin-bottom>
+      <button ion-item detail-none (click)="openDealPage()">        
+        Send Deal
+        <ion-icon name="arrow-forward" item-end color="primary"></ion-icon>
       </button>
-    </ion-item>
-    <ion-card-content *ngIf="data.buyer != null">
-      <h2>{{data.buyer.displayName}}</h2>
-      <h3>{{data.buyer.phoneNumber}}</h3>
-    </ion-card-content>
-    <ion-card-content *ngIf="data.buyer == null">
-      <h2>
-        <i>Not Selected</i>
-      </h2>
-    </ion-card-content>
-  </ion-card>
-  <ion-card>
-    <ion-item>
-      <h2>
-        <strong>Seller</strong>
-      </h2>
-      <button ion-button clear item-end icon-only (click)="removeSeller()" *ngIf="data.seller != null">
-        <ion-icon name="trash"></ion-icon>
+    </ion-card>
+    <ion-card margin-bottom>
+      <button ion-item detail-none (click)="openDailyRatePage()">        
+        Daily Rates
+        <ion-icon name="arrow-forward" item-end color="primary"></ion-icon>
       </button>
-    </ion-item>
-    <ion-card-content *ngIf="data.seller != null">
-      <h2>{{data.seller.displayName}}</h2>
-      <h3>{{data.seller.phoneNumber}}</h3>
-    </ion-card-content>
-    <ion-card-content *ngIf="data.seller == null">
-      <h2>
-        <i>Not Selected</i>
-      </h2>
-    </ion-card-content>
-  </ion-card>
-  <ion-item margin-top>
-    <ion-label floating>Rate for Buyer (in Rs)</ion-label>
-    <ion-input type="number" name="buyRate" [(ngModel)]="data.buyRate"></ion-input>
-  </ion-item>
-  <ion-item margin-top>
-    <ion-label floating>Rate for Seller (in Rs)</ion-label>
-    <ion-input type="number" name="saleRate" [(ngModel)]="data.saleRate"></ion-input>
-  </ion-item>
-  <ion-item margin-top>
-    <ion-label floating>Chick Pea Type</ion-label>
-    <ion-select name="chickPeaType" [(ngModel)]="data.chickPeaType">
-      <ion-option value="42/44">42/44</ion-option>
-      <ion-option value="44/46">44/46</ion-option>
-      <ion-option value="58/60">58/60</ion-option>
-      <ion-option value="60/62">60/62</ion-option>
-      <ion-option value="62/64">62/64</ion-option>
-    </ion-select>
-  </ion-item>
-  <ion-item margin-top>
-    <ion-label floating>Containers</ion-label>
-    <ion-input type="number" name="containerCount" [(ngModel)]="data.containerCount"></ion-input>
-  </ion-item>
-  <ion-item margin-top>
-    <ion-label floating>Containers Size (in Quintal)</ion-label>
-    <ion-input type="number" name="containerQuantity" [(ngModel)]="data.containerQuantity"></ion-input>
-  </ion-item>
-  <ion-item margin-top>
-    <ion-label fixed>Date</ion-label>
-    <ion-input type="date" name="date" [(ngModel)]="data.date"></ion-input>
-  </ion-item>
-  <ion-row margin-top text-center>
-    <ion-col col-6>
-      <button ion-button (click)="sendBuyer()">
-        Send To Buyer
-      </button>
-    </ion-col>
-    <ion-col col-6>
-      <button ion-button (click)="sendSeller()">
-        Send To Seller
-      </button>
-    </ion-col>
-    <ion-col col-12>
-      <button ion-button (click)="reset()">
-        Reset
-      </button>
-    </ion-col>
-  </ion-row>
-</ion-content>
+    </ion-card>    
+  </ion-content>
+  

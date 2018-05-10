@@ -7,14 +7,14 @@ import { Contacts } from '@ionic-native/contacts';
 import { SMS } from '@ionic-native/sms';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
+import { MenuPage } from '../pages/menu/menu';
 import { ContactProvider } from '../providers/contact/contact';
 
 
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    MenuPage
   ],
   imports: [
     BrowserModule,
@@ -23,7 +23,7 @@ import { ContactProvider } from '../providers/contact/contact';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    MenuPage
   ],
   providers: [
     StatusBar,
