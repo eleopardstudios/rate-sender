@@ -94,14 +94,14 @@
       <p ion-text color="danger">Please enter container size.</p>
     </ion-item>
     <ion-row no-padding align-items-center>
-      <ion-col col-10 margin-top align-items-center>
-        <ion-item>
+      <ion-col col-10 no-padding align-items-center>
+        <ion-item margin-top>
           <ion-label stacked>Date</ion-label>
           <ion-input type="text" placeholder="dd/mm/yyyy" formControlName="date" readonly></ion-input>
         </ion-item>
       </ion-col>
-      <ion-col col-2 margin-top align-items-center>
-        <button ion-button icon-only clear (click)="loadDatePicker('date')">
+      <ion-col col-2 no-padding align-items-center>
+        <button ion-button margin-top icon-only clear (click)="loadDatePicker('date')">
           <ion-icon name="calendar"></ion-icon>
         </button>
       </ion-col>
@@ -110,19 +110,19 @@
       <p ion-text color="danger">Please enter date.</p>
     </ion-item>
     <ion-row no-padding align-items-center>
-      <ion-col col-8 margin-top align-items-center>
-        <ion-item>
+      <ion-col col-8 no-padding align-items-center>
+        <ion-item margin-top>
           <ion-label stacked>Delivery Date</ion-label>
           <ion-input type="text" placeholder="dd/mm/yyyy" formControlName="deliveryDate" readonly></ion-input>
         </ion-item>
       </ion-col>
-      <ion-col col-2 margin-top align-items-center>
-          <button ion-button icon-only clear (click)="dealForm.controls['deliveryDate'].setValue('')">
+      <ion-col col-2 no-padding align-items-center>
+          <button ion-button margin-top icon-only clear (click)="dealForm.controls['deliveryDate'].setValue('')">
             <ion-icon name="close"></ion-icon>
           </button>
         </ion-col>
-      <ion-col col-2 margin-top align-items-center>
-        <button ion-button icon-only clear (click)="loadDatePicker('deliveryDate')">
+      <ion-col col-2 no-padding align-items-center>
+        <button ion-button margin-top icon-only clear (click)="loadDatePicker('deliveryDate')">
           <ion-icon name="calendar"></ion-icon>
         </button>
       </ion-col>
