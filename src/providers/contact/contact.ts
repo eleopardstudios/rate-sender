@@ -11,11 +11,55 @@ import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/co
 export class ContactProvider {
   private loading: Loading;
   private contactList: any;
+  private demoData: any;
   constructor(private contacts: Contacts,
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController,) {
-    console.log('Hello ContactProvider Provider');
+    private toastCtrl: ToastController, ) {
+
+    this.demoData = [
+      {
+        displayName: 'One',
+        phoneNumbers: [
+          {
+            value: '+919981576060'
+          }
+        ]
+      },
+      {
+        displayName: 'two',
+        phoneNumbers: [
+          {
+            value: '+919981576060'
+          }
+        ]
+      },
+      {
+        displayName: 'three',
+        phoneNumbers: [
+          {
+            value: '+919981576060'
+          }
+        ]
+      },
+      {
+        displayName: 'four',
+        phoneNumbers: [
+          {
+            value: '+919981576060'
+          }
+        ]
+      },
+      {
+        displayName: 'five',
+        phoneNumbers: [
+          {
+            value: '+919981576060'
+          }
+        ]
+      }
+    ];
   }
+
 
   getPhoneContacts(): Promise<any> {
     var promise = new Promise((resolve, reject) => {
@@ -31,12 +75,17 @@ export class ContactProvider {
         this.contactList = contacts;
         resolve(contacts);
       });
+      // setTimeout(() => {
+      //   this.hideLoading();
+      //   this.contactList = this.demoData;
+      //   resolve(this.demoData);
+      // }, 1000);
     });
     return promise;
   }
 
   refreshContacts(): Promise<any> {
-    var promise = new Promise((resolve, reject) => {     
+    var promise = new Promise((resolve, reject) => {
       this.showLoading();
       this.retrieveContacts().then((contacts) => {
         console.log("contacts fetched");
@@ -44,6 +93,11 @@ export class ContactProvider {
         this.contactList = contacts;
         resolve(contacts);
       });
+      // setTimeout(() => {
+      //   this.hideLoading();
+      //   this.contactList = this.demoData;
+      //   resolve(this.demoData);
+      // }, 1000);
     });
     return promise;
   }

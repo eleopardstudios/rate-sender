@@ -1,11 +1,13 @@
 
 import { Component } from '@angular/core';
-import { IonicPage, Platform, NavController, NavParams } from 'ionic-angular';
-import { ModalController } from 'ionic-angular';
-import { AlertController } from 'ionic-angular';
-import { ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavController, NavParams, Form } from 'ionic-angular';
+import { ModalController, AlertController, ActionSheetController } from 'ionic-angular';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { SMS } from '@ionic-native/sms';
 import { SocialSharing } from '@ionic-native/social-sharing';
+import { DatePicker } from '@ionic-native/date-picker';
+
 import { ContactProvider } from '../../providers/contact/contact';
 
 /**
@@ -23,26 +25,34 @@ import { ContactProvider } from '../../providers/contact/contact';
 export class DealPage {
 
   private isWeb: boolean;
-  data: any;
+  private dealForm: any;
 
   constructor(public navCtrl: NavController,
     public platform: Platform,
     public modalCtrl: ModalController,
     public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController,
-    public contactProvider: ContactProvider,
-    private sms: SMS,
-    private socialSharing: SocialSharing) {
-    this.data = {
-      buyer: null,
-      seller: null,
-      buyRate: 0,
-      saleRate: 0,
-      containerCount: 0,
-      containerQuantity: 240,
-      chickPeaType: null,
-      date: null
-    };
+    public alertCtrl: AlertController,
+    public formBuilder: FormBuilder,
+    public datePipe: DatePipe,
+    public sms: SMS,
+    public socialSharing: SocialSharing,
+    private datePicker: DatePicker,
+    public contactProvider: ContactProvider) {
+    this.isWeb = false;
+    this.dealForm = formBuilder.group({
+      'buyerName': ['', Validators.required],
+      'buyerPhoneNumber': ['', Validators.required],
+      'rateForBuyer': ['', Validators.required],
+      'sellerName': ['', Validators.required],
+      'sellerPhoneNumber': ['', Validators.required],
+      'rateForSeller': ['', Validators.required],
+      'chickPeasType': ['42/44', Validators.required],
+      'containerCount': ['', Validators.required],
+      'containerSize': ['240', Validators.required],
+      'date': [this.datePipe.transform(new Date(), 'dd/MM/yyyy'), Validators.required],
+      'deliveryDate': ['']
+    });
   }
 
   ngOnInit() {
@@ -53,67 +63,20 @@ export class DealPage {
     });
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad ContactListPage');
-    this.data = {
-      buyer: null,
-      seller: null,
-      buyRate: 0,
-      saleRate: 0,
-      containerCount: 0,
-      containerQuantity: 240,
-      chickPeaType: "42/44",
-      date: null
-    };
-  }
-
-
   selectBuyer() {
-    // let contacts : any = [
-    //   {
-    //     displayName: "Hello"
-    //   },
-    //   {
-    //     displayName: "shobhit"
-    //   },
-    //   {
-    //     displayName: "satyam"
-    //   },
-    //   {
-    //     displayName: "skand"
-    //   },
-    //   {
-    //     displayName: "rohit"
-    //   }
-    // ];
-    // let obj = {
-    //   'title': 'Select Buyer',
-    //   'contactList': contacts
-    // };
-    // let contactsModal = this.modalCtrl.create('ContactListPage', obj);
-    // contactsModal.onDidDismiss((contact) => {
-    //   if (contact) {
-    //     this.data.buyer = {
-    //       'displayName': contact.displayName,
-    //       'phoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-    //     }
-    //   }
-    // });
-    // contactsModal.present();  
     let obj = {
       'title': 'Select Buyer'
     };
     let contactsModal = this.modalCtrl.create('ContactListPage', obj);
     contactsModal.onDidDismiss((contact) => {
       if (contact) {
-        this.data.buyer = {
-          'displayName': contact.displayName,
-          'phoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-        }
+        this.dealForm.patchValue({
+          'buyerName': contact.displayName,
+          'buyerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+        });
       }
     });
     contactsModal.present();
-
   }
 
   selectSeller() {
@@ -123,176 +86,153 @@ export class DealPage {
     let contactsModal = this.modalCtrl.create('ContactListPage', obj);
     contactsModal.onDidDismiss((contact) => {
       if (contact) {
-        this.data.seller = {
-          'displayName': contact.displayName,
-          'phoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-        }
+        this.dealForm.patchValue({
+          'sellerName': contact.displayName,
+          'sellerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+        });
       }
     });
     contactsModal.present();
   }
 
-  removeBuyer() {
-    this.data.buyer = null;
+  loadDatePicker(controlKey) {
+
+    this.datePicker.show({
+      date: new Date(),
+      mode: 'date',
+      androidTheme: this.datePicker.ANDROID_THEMES.THEME_HOLO_DARK
+    }).then((date) => {
+      console.log(JSON.stringify(date));
+      console.log(controlKey)
+      this.dealForm.controls[controlKey].setValue(this.datePipe.transform(date, 'dd/MM/yyyy'));
+    }, (err) => {
+      console.log('Error occurred while getting date: ', err);
+    }
+    );
   }
 
-  removeSeller() {
-    this.data.seller = null;
+
+  initActionSheet(type, msg, phoneNumber) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'Options',
+      buttons: [
+        {
+          text: 'Send SMS',
+          handler: () => {
+            this.contactProvider.showLoading("Sending SMS");
+            this.sms.send(phoneNumber, msg).then(() => {
+              this.contactProvider.hideLoading();
+              this.contactProvider.showMsg(type + " SMS Sent");
+            }, () => {
+              this.contactProvider.hideLoading();
+              this.contactProvider.showMsg(type + " SMS Not Sent");
+            });
+          }
+        }, {
+          text: 'Share via WhatsApp',
+          handler: () => {
+            this.socialSharing.shareViaWhatsApp(msg).then((obj) => {
+              console.log("success");
+              this.contactProvider.showMsg("Successfully sent via Whatsapp")
+              console.log(JSON.stringify(obj));
+            }, (obj) => {
+              console.log("fail");
+              console.log(JSON.stringify(obj));
+            })
+            console.log('Share clicked');
+          }
+        }, {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+    actionSheet.present();
   }
 
-  isValid() {
-    if (this.data.chickPeaType == null || this.data.chickPeaType == "") {
-      this.contactProvider.showMsg("Please select Chick Pea Type");
-      return false;
-    } 
-    if( this.data.containerCount == 0 || this.data.containerCount == "" || this.data.containerCount == null) {
-      this.contactProvider.showMsg("Please enter container count");
-      return false;
-    } 
-    if(this.data.containerQuantity == 0 || this.data.containerQuantity == "" || this.data.containerQuantity == null) { 
-      this.contactProvider.showMsg("Please enter container quantity");
-      return false;
-    }
-    if(this.data.date == null || this.data.date == "") {
-      this.contactProvider.showMsg("Please provide date");
-      return false;
-    }
-    return true;
-  }
-  isBuyerValid() {
-    if (this.data.buyer == null) {
-      this.contactProvider.showMsg("Please select buyer");
-      return false;
-    }
-    if(this.data.buyRate == null || this.data.buyRate == "" || this.data.buyRate == 0) {
-      this.contactProvider.showMsg("Please provide Rate for buyer");
-      return false;
-    }    
-   
-    return true;
-  }
-
-  isSellerValid() {
-    if (this.data.seller == null) {
-      this.contactProvider.showMsg("Please select seller");
-      return false;
-    }
-
-    if(this.data.saleRate == null || this.data.saleRate == "" || this.data.saleRate == 0) {
-      this.contactProvider.showMsg("Please provide Rate for Seller");
-      return false;
-    }    
-    return true;
-  }
 
   sendBuyer() {
-
-    if (!this.isBuyerValid() || !this.isValid()) {      
-      return;
+    console.log(JSON.stringify(this.dealForm.value));
+    var controls = this.dealForm.controls;
+    var buyerSms = ["Buyer: ", controls['buyerName'].value, ", ",
+    "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
+    "\nRate: ", controls['rateForBuyer'].value, " Rs", ", ",
+    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
+    "\nDate: ", controls['date'].value, ", "];
+    if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
+      buyerSms.push("\nDelivery: By " + controls['deliveryDate'].value + ", ");
     }
+    buyerSms.push("\nDalal: Shres Overseas, ");
+    buyerSms.push("\nRaja Agrawal, ");    
+    buyerSms.push("\nGopi Agrawal");
 
-    var buyerSms = ["Buyer: ", this.data.buyer.displayName,
-      "\nRate: ", this.data.buyRate, " Rs",
-      "\nConatainers: ", this.data.containerCount, " (", this.data.containerQuantity, " Quintal)",
-      "\nDate: ", this.data.date,
-      "\nDalal: Shre Overseas",
-      "\nRaja Agrawal"].join("");
-
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Options',
+    let sms: string = buyerSms.join("");
+    let alert = this.alertCtrl.create({
+      title: 'Confirm SMS',
+      message: sms,
       buttons: [
         {
-          text: 'Send SMS',
-          handler: () => {
-            this.contactProvider.showLoading("Sending SMS");
-            this.sms.send(this.data.buyer.phoneNumber, buyerSms).then(() => {
-              this.contactProvider.hideLoading();
-              this.contactProvider.showMsg("Buyer SMS Sent");
-            }, () => {
-              this.contactProvider.hideLoading();
-              this.contactProvider.showMsg("Buyer SMS Not Sent");
-            });
-          }
-        }, {
-          text: 'Share via WhatsApp',
-          handler: () => {
-            this.socialSharing.shareViaWhatsApp(buyerSms).then((obj) => {
-              console.log("success");
-              this.contactProvider.showMsg("Successfully sent via Whatsapp")
-              console.log(JSON.stringify(obj));
-            }, (obj) => {
-              console.log("fail");
-              console.log(JSON.stringify(obj));
-            })
-            console.log('Share clicked');
-          }
-        }, {
           text: 'Cancel',
           role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          handler: () => {
+            this.initActionSheet('Buyer', sms, controls['buyerPhoneNumber'].value);
+          }
         }
       ]
     });
-    actionSheet.present();
+    alert.present();
   }
-  sendSeller() {
-    if (!this.isSellerValid() || !this.isValid()) {      
-      return;
-    }
-    var selllerSMS = ["Seller: ", this.data.buyer.displayName,
-      "\nRate: ", this.data.saleRate, " Rs",
-      "\nConatainers: ", this.data.containerCount, " (", this.data.containerQuantity, " Quintal)",
-      "\nDate: ", this.data.date,
-      "\nDalal: Shre Overseas",
-      "\nRaja Agrawal"].join("");
 
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Options',
+  sendSeller() {
+    console.log(JSON.stringify(this.dealForm.value));
+    var controls = this.dealForm.controls;
+    var sellerSms = ["Seller: ", controls['sellerName'].value, ", ",
+    "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
+    "\nRate: ", controls['rateForSeller'].value, " Rs", ", ",
+    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
+    "\nDate: ", controls['date'].value, ", "];
+    if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
+      sellerSms.push("\nDelivery: By " + controls['deliveryDate'].value + ", ");
+    }
+    sellerSms.push("\nDalal: Shree Overseas, ");
+    sellerSms.push("\nRaja Agrawal, ");    
+    sellerSms.push("\nGopi Agrawal");
+    let sms: string = sellerSms.join("");
+    let alert = this.alertCtrl.create({
+      title: 'Confirm SMS',
+      message: sms,
       buttons: [
         {
-          text: 'Send SMS',
-          handler: () => {
-            this.contactProvider.showLoading("Sending SMS");
-            this.sms.send(this.data.seller.phoneNumber, selllerSMS).then(() => {
-              this.contactProvider.hideLoading();
-              this.contactProvider.showMsg("Seller SMS Sent");
-            }, () => {
-              this.contactProvider.hideLoading();
-              this.contactProvider.showMsg("Seller SMS Not Sent");
-            });
-          }
-        }, {
-          text: 'Share via WhatsApp',
-          handler: () => {
-            this.socialSharing.shareViaWhatsApp(selllerSMS).then((obj) => {
-              console.log("success");
-              this.contactProvider.showMsg("Successfully sent via Whatsapp")
-              console.log(JSON.stringify(obj));
-            }, (obj) => {
-              console.log("fail");
-              console.log(JSON.stringify(obj));
-            })
-            console.log('Share clicked');
-          }
-        }, {
           text: 'Cancel',
           role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          handler: () => {
+            this.initActionSheet('Seller', sms, controls['sellerPhoneNumber'].value);
+          }
         }
       ]
     });
-    actionSheet.present();
+    alert.present();    
   }
 
   reset() {
-    this.data = {
-      buyer: null,
-      seller: null,
-      buyRate: 0,
-      saleRate: 0,
-      containerCount: 0,
-      containerQuantity: 240,
-      chickPeaType: "42/44",
-      date: null
-    };
+    this.dealForm.reset({
+      'buyerName': '',
+      'buyerPhoneNumber': '',
+      'rateForBuyer': '',
+      'sellerName': '',
+      'sellerPhoneNumber': '',
+      'rateForSeller': '',
+      'chickPeasType': '42/44',
+      'containerCount': '',
+      'containerSize': '240',
+      'date': this.datePipe.transform(new Date(), 'dd/MM/yyyy'),
+      'deliveryDate': ''
+    })
   }
-
 }
