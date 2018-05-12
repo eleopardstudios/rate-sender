@@ -13,42 +13,47 @@
     <ion-list margin-bottom>
       <div formArrayName="rates" margin-bottom>
         <section [formGroupName]="i" *ngFor="let rate of form.controls.rates.controls; let i = index">
-          <ion-item-group>
-            <ion-item-divider color="light">Rate #{{ i + 1 }}</ion-item-divider>
-            <ion-item>
-              <ion-label stacked>ChickPeas Type</ion-label>
-              <ion-select formControlName="chickPeasType" interface="popover">
-                <ion-option value="40/42">40/42</ion-option>
-                <ion-option value="42/44">42/44</ion-option>
-                <ion-option value="44/46">44/46</ion-option>
-                <ion-option value="58/60">58/60</ion-option>
-                <ion-option value="60/62">60/62</ion-option>
-                <ion-option value="62/64">62/64</ion-option>
-                <ion-option value="64/66">64/66</ion-option>
-                <ion-option value="66/68">66/68</ion-option>
-                <ion-option value="75/80">75/80</ion-option>
-              </ion-select>
-            </ion-item>
+          <ion-card margin-vertical no-padding>
             <ion-row>
               <ion-col>
                 <ion-item>
+                  <ion-label stacked>ChickPeas Type</ion-label>
+                  <ion-select formControlName="chickPeasType" interface="popover">
+                    <ion-option value="40/42">40/42</ion-option>
+                    <ion-option value="42/44">42/44</ion-option>
+                    <ion-option value="44/46">44/46</ion-option>
+                    <ion-option value="58/60">58/60</ion-option>
+                    <ion-option value="60/62">60/62</ion-option>
+                    <ion-option value="62/64">62/64</ion-option>
+                    <ion-option value="64/66">64/66</ion-option>
+                    <ion-option value="66/68">66/68</ion-option>
+                    <ion-option value="75/80">75/80</ion-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item no-padding>
                   <ion-label stacked>From:</ion-label>
                   <ion-input type="number" formControlName="from"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col>
-                <ion-item>
+                <ion-item  no-padding>
                   <ion-label stacked>To:</ion-label>
                   <ion-input type="number" formControlName="to"></ion-input>
                 </ion-item>
               </ion-col>
             </ion-row>
-            <!-- Allow generated input field to be removed -->
-            <span float-right ion-button icon-left clear *ngIf="form.controls.rates.length > 1" (click)="removeRateField(i)">
-              <ion-icon name="close"></ion-icon>
-              Remove
-            </span>
-          </ion-item-group>
+            <ion-row>
+              <ion-col text-right>
+                <!-- Allow generated input field to be removed -->
+                <button ion-button icon-left clear small no-padding *ngIf="form.controls.rates.length > 1" (click)="removeRateField(i)">
+                  <ion-icon name="close"></ion-icon>
+                  Remove
+                </button>
+              </ion-col>
+            </ion-row>
+          </ion-card>
         </section>
       </div>
     </ion-list>

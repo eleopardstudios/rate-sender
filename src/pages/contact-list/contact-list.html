@@ -13,14 +13,20 @@
   <ion-searchbar [(ngModel)]="searchTerm" [formControl]="searchControl"></ion-searchbar>
 </ion-header>
 <ion-content>
-  <ion-list [virtualScroll]="filteredContacts">
+  <ion-list [virtualScroll]="filteredContacts" *ngIf="!multiple">
     <button ion-item *virtualItem="let contact" (click)="selectContact(contact)" detail-none>
       {{contact.displayName}}
     </button>
   </ion-list>
+  <ion-list [virtualScroll]="filteredContacts" *ngIf="multiple">
+    <ion-item *virtualItem="let contact" (click)="selectContact(contact)" detail-none>
+      <ion-label>{{contact.displayName}}</ion-label>
+      <ion-checkbox></ion-checkbox>
+    </ion-item>
+  </ion-list>
   <ion-fab right bottom>
     <button ion-fab color="primary" icon-only (click)="refresh()">
-        <ion-icon name="refresh"></ion-icon>
+      <ion-icon name="refresh"></ion-icon>
     </button>
   </ion-fab>
 </ion-content>

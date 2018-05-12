@@ -74,6 +74,10 @@ export class ContactProvider {
         this.hideLoading();
         this.contactList = contacts;
         resolve(contacts);
+      }, (obj) => {
+        this.hideLoading();
+        console.log(JSON.stringify(obj));
+        resolve([]);
       });
       // setTimeout(() => {
       //   this.hideLoading();
@@ -92,6 +96,10 @@ export class ContactProvider {
         this.hideLoading();
         this.contactList = contacts;
         resolve(contacts);
+      }, (obj) => {
+        this.hideLoading();
+        console.log(JSON.stringify(obj));
+        resolve([]);
       });
       // setTimeout(() => {
       //   this.hideLoading();
@@ -130,7 +138,6 @@ export class ContactProvider {
       this.loading = null;
     }
   }
-
 
   public showMsg(text: string = "", msgDuration: number = 5000) {
     let toast = this.toastCtrl.create({

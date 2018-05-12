@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ModalController, AlertController, ActionSheetController } from 'ionic-angular';
 import { FormBuilder, FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
+import { SMS } from '@ionic-native/sms';
+import { SocialSharing } from '@ionic-native/social-sharing';
+import { ContactProvider } from '../../providers/contact/contact';
 
 /**
  * Generated class for the DailyRatePage page.
@@ -19,9 +22,13 @@ export class DailyRatePage {
   public form: FormGroup;
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
+    public modalCtrl: ModalController,
     public actionSheetCtrl: ActionSheetController,
     public alertCtrl: AlertController,
-    private _FB: FormBuilder) {
+    private _FB: FormBuilder,
+    public contactProvider: ContactProvider,
+    public sms: SMS,
+    public socialSharing: SocialSharing) {
     this.form = this._FB.group({
       rates: this._FB.array([
         this.initRateFields('42/44'),
@@ -61,15 +68,15 @@ export class DailyRatePage {
     let rates = this.form.value.rates;
     rates.forEach(rate => {
       msgArray.push("\n", rate.chickPeasType, " @ ", rate.from);
-      if(rate.to && rate.to != "") {
+      if (rate.to && rate.to != "") {
         msgArray.push(" - ", rate.to, "/-", ", ");
       } else {
         msgArray.push("/-, ");
       }
     });
-    msgArray.push("\nSpot Indore, \nRegards, \nShree Overseas, \n910910690, \n910910680");   
+    msgArray.push("\nSpot Indore, \nRegards, \nShree Overseas, \n910910690, \n910910680");
 
-    let msg: any = msgArray.join(""); 
+    let msg: any = msgArray.join("");
 
     let alert = this.alertCtrl.create({
       title: 'Confirm SMS',
@@ -82,11 +89,61 @@ export class DailyRatePage {
         {
           text: 'Confirm',
           handler: () => {
-            console.log(msg);
+            this.initActionSheet("Rate", msg)
           }
         }
       ]
     });
     alert.present();
+  }
+
+  initActionSheet(type, msg) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'Options',
+      buttons: [
+        {
+          text: 'Send Single SMS',
+          handler: () => {
+            let obj = {
+              'title': 'Select Receiver'
+            };
+            let contactsModal = this.modalCtrl.create('ContactListPage', obj);
+            contactsModal.onDidDismiss((contact) => {
+              if (contact) {
+                let phoneNumber = (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+                this.contactProvider.showLoading("Sending SMS");
+                this.sms.send(phoneNumber, msg).then(() => {
+                  this.contactProvider.hideLoading();
+                  this.contactProvider.showMsg(type + " SMS Sent");
+                }, () => {
+                  this.contactProvider.hideLoading();
+                  this.contactProvider.showMsg(type + " SMS Not Sent");
+                });               
+              } else {
+                this.contactProvider.showMsg("Contact Not selected");
+              }
+            });
+            contactsModal.present();
+          }
+        }, {
+          text: 'Share via WhatsApp',
+          handler: () => {
+            this.socialSharing.shareViaWhatsApp(msg).then((obj) => {
+              console.log("success");
+              this.contactProvider.showMsg("Successfully sent via Whatsapp")
+              console.log(JSON.stringify(obj));
+            }, (obj) => {
+              console.log("fail");
+              console.log(JSON.stringify(obj));
+            })
+            console.log('Share clicked');
+          }
+        }, {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+    actionSheet.present();
   }
 }

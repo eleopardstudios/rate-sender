@@ -16,7 +16,7 @@ export class ContactListPage {
   private filteredContacts: any;  
   private searchTerm: string;  
   private searchControl: FormControl;
-
+  private multiple: boolean;
 
   constructor(public navCtrl: NavController,        
     public navParams: NavParams,    
@@ -26,12 +26,16 @@ export class ContactListPage {
     this.searchControl = new FormControl();
     this.contactList = [];
     this.title = "";
-    this.filteredContacts = [];   
+    this.multiple = false;
+    this.filteredContacts = [];       
   } 
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ContactListPage');
-    this.title = this.navParams.get("title");           
+    this.title = this.navParams.get("title"); 
+    this.multiple = this.navParams.get("multiple");
+    this.multiple = this.multiple || false;
+
     this.contactProvider.getPhoneContacts().then((contacts) => {
       this.contactList = contacts;
       this.filteredContacts = this.setFilteredItems();
