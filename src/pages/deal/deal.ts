@@ -156,7 +156,7 @@ export class DealPage {
     var controls = this.dealForm.controls;
     var buyerSms = ["Buyer: ", controls['buyerName'].value, ", ",
     "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
-    "\nRate: ", controls['rateForBuyer'].value, " Rs", ", ",
+    "\nRate: ", "Rs ", controls['rateForBuyer'].value, "/-, ",
     "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
     "\nDate: ", controls['date'].value, ", "];
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
@@ -191,7 +191,7 @@ export class DealPage {
     var controls = this.dealForm.controls;
     var sellerSms = ["Seller: ", controls['sellerName'].value, ", ",
     "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
-    "\nRate: ", controls['rateForSeller'].value, " Rs", ", ",
+    "\nRate: ", "Rs ", controls['rateForSeller'].value, "/-, ",
     "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
     "\nDate: ", controls['date'].value, ", "];
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
