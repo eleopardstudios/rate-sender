@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { FormControl } from '@angular/forms';
-import { ViewController } from 'ionic-angular';
-import 'rxjs/add/operator/debounceTime';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { ContactProvider } from '../../providers/contact/contact';
 
 @IonicPage()
@@ -10,67 +7,89 @@ import { ContactProvider } from '../../providers/contact/contact';
   selector: 'page-contact-list',
   templateUrl: 'contact-list.html',
 })
-export class ContactListPage {    
-  private title: string;
-  private contactList: any;
-  private filteredContacts: any;  
-  private searchTerm: string;  
-  private searchControl: FormControl;
-  private multiple: boolean;
-
-  constructor(public navCtrl: NavController,        
-    public navParams: NavParams,    
-    public viewCtrl: ViewController, 
+export class ContactListPage {
+  contactList: any;
+  constructor(public navCtrl: NavController,
+    public navParams: NavParams,
+    public alertCtrl: AlertController,
     public contactProvider: ContactProvider) {
-    this.searchTerm = "";
-    this.searchControl = new FormControl();
     this.contactList = [];
-    this.title = "";
-    this.multiple = false;
-    this.filteredContacts = [];       
-  } 
+  }
+
+  ngOnInit() {
+    // Let's navigate from TabsPage to Page1
+    this.contactList = [];
+ }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ContactListPage');
-    this.title = this.navParams.get("title"); 
-    this.multiple = this.navParams.get("multiple");
-    this.multiple = this.multiple || false;
+  }
 
-    this.contactProvider.getPhoneContacts().then((contacts) => {
+  ionViewDidEnter() {    
+    console.log('ionViewDidEnter ContactListPage');
+    this.contactProvider.showLoading();
+    this.contactProvider.getContactList().then((contacts) => {
+      this.contactProvider.hideLoading();      
+      console.log(JSON.stringify(contacts));      
       this.contactList = contacts;
-      this.filteredContacts = this.setFilteredItems();
-    });   
-    this.searchControl.valueChanges.debounceTime(200).subscribe(search => {
-      this.filteredContacts = this.setFilteredItems();
+    }, (obj) => {
+      this.contactProvider.hideLoading();
+      console.log("Error in getting contact list");
     });
   }
 
-  setFilteredItems() {    
-    console.log(this.searchTerm);
-    if(this.searchTerm == "") {
-      return this.contactList.slice();
-    }
-    return this.contactList.filter((contact) => {
-      //console.log(contact.displayName);
-      if(!contact.displayName) {
-        return false;
-      }
-      return contact.displayName.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1;
+  removeContact(index) {
+    let alert = this.alertCtrl.create({
+      title: 'Confirm',
+      message: 'Are you sure to remove this contact.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.contactList.splice(index, 1);
+            this.contactProvider.showLoading();
+            this.contactProvider.updateContactList(this.contactList).then(() => {
+              this.contactProvider.hideLoading();
+              this.contactProvider.showMsg("Contact removed");
+            }, () => {
+              this.contactProvider.hideLoading();
+              this.contactProvider.showMsg("Error in removing contact");
+            });
+          }
+        }
+      ]
+    });
+    alert.present();    
+  }
+
+  addContact() {
+    this.contactProvider.selectContact().then((contact) => {
+      console.log(JSON.stringify(contact));
+      this.contactProvider.showLoading();
+      let contactData: any  = {
+        'displayName': contact.displayName,
+        'phoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+      };
+      this.contactList.push(contactData);      
+      this.contactProvider.updateContactList(this.contactList).then(() => {
+        this.contactProvider.hideLoading();
+        this.contactProvider.showMsg("Contact added");
+      }, () => {
+        this.contactProvider.hideLoading();
+        this.contactProvider.showMsg("Error in adding contact");
+      });
+    }, (obj) => {
+      console.log(JSON.stringify(obj));
+      this.contactProvider.showMsg("Contact not selected");
     });
   }
 
-  refresh() {
-    this.contactProvider.refreshContacts().then((contacts) => {
-      this.contactList = contacts;
-      this.filteredContacts = this.setFilteredItems();
-    });   
+  displayPhoneNumber(contact) {
+    return (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : "";
   }
 
-  closeModal() {
-    this.viewCtrl.dismiss(null);
-  }
-
-  selectContact(contact) {
-    this.viewCtrl.dismiss(contact);
-  }
 }

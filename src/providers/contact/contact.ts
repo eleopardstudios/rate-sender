@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LoadingController, Loading, AlertController, ToastController } from 'ionic-angular';
 import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/contacts';
+import { Storage } from '@ionic/storage';
 /*
   Generated class for the ContactProvider provider.
 
@@ -10,56 +11,16 @@ import { Contacts, ContactFieldType, ContactFindOptions } from '@ionic-native/co
 @Injectable()
 export class ContactProvider {
   private loading: Loading;
-  private contactList: any;
-  private demoData: any;
+  private contactList: any;  
   constructor(private contacts: Contacts,
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController, ) {
-
-    this.demoData = [
-      {
-        displayName: 'One',
-        phoneNumbers: [
-          {
-            value: '+919981576060'
-          }
-        ]
-      },
-      {
-        displayName: 'two',
-        phoneNumbers: [
-          {
-            value: '+919981576060'
-          }
-        ]
-      },
-      {
-        displayName: 'three',
-        phoneNumbers: [
-          {
-            value: '+919981576060'
-          }
-        ]
-      },
-      {
-        displayName: 'four',
-        phoneNumbers: [
-          {
-            value: '+919981576060'
-          }
-        ]
-      },
-      {
-        displayName: 'five',
-        phoneNumbers: [
-          {
-            value: '+919981576060'
-          }
-        ]
-      }
-    ];
+    private toastCtrl: ToastController,
+    private storage: Storage) {    
   }
-
+ 
+  selectContact(): Promise<any> {
+    return this.contacts.pickContact();
+  }
 
   getPhoneContacts(): Promise<any> {
     var promise = new Promise((resolve, reject) => {
@@ -118,8 +79,51 @@ export class ContactProvider {
     options.hasPhoneNumber = true;
     return this.contacts.find(fields, options);
   }
+ 
+  updateContactList(contacts): Promise<any> {
+    let promise = new Promise((resolve, reject) => {
+      this.storage.ready().then(() => {
+        let data: any = {
+          'list': contacts
+        }
+        this.storage.set("rate-contact-list", JSON.stringify(data)).then(() => {
+          resolve();
+        }, () => {
+          console.log("contacts cannot be saved")
+          reject();
+        });
+      }, () => {
+        console.log("storage not ready");
+        reject();
+      })
+    });
+    return promise;
+  }
 
-  public showLoading(msg: string = null) {
+  getContactList(): Promise<any> {
+    let promise = new Promise((resolve, reject) => {
+      this.storage.ready().then(() => {
+        this.storage.get("rate-contact-list").then((data) => {
+          if (data == null) {
+            resolve([]);
+          } else {
+            console.log(data);
+            data = JSON.parse(data);            
+            resolve(data.list);
+          }
+        }, () => {
+          console.log("contacts cannot be retreived")
+          resolve([]);
+        });
+      }, () => {
+        console.log("storage not ready");
+        resolve([]);
+      })
+    });
+    return promise;
+  }
+
+  showLoading(msg: string = null) {
     if (this.loading) {
       return;
     }
@@ -132,17 +136,18 @@ export class ContactProvider {
     return this.loading.present();
   }
 
-  public hideLoading() {
+  hideLoading() {
     if (this.loading) {
       this.loading.dismiss();
       this.loading = null;
     }
   }
 
-  public showMsg(text: string = "", msgDuration: number = 5000) {
+  showMsg(text: string = "", msgDuration: number = 2000) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: msgDuration
+      duration: msgDuration,
+      position: 'top'
     });
     toast.present();
   }

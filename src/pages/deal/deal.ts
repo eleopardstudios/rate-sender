@@ -1,7 +1,7 @@
 
 import { Component } from '@angular/core';
 import { IonicPage, Platform, NavController, NavParams, Form } from 'ionic-angular';
-import { ModalController, AlertController, ActionSheetController } from 'ionic-angular';
+import { AlertController, ActionSheetController } from 'ionic-angular';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SMS } from '@ionic-native/sms';
@@ -29,7 +29,6 @@ export class DealPage {
 
   constructor(public navCtrl: NavController,
     public platform: Platform,
-    public modalCtrl: ModalController,
     public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController,
     public alertCtrl: AlertController,
@@ -64,39 +63,30 @@ export class DealPage {
   }
 
   selectBuyer() {
-    let obj = {
-      'title': 'Select Buyer'
-    };
-    let contactsModal = this.modalCtrl.create('ContactListPage', obj);
-    contactsModal.onDidDismiss((contact) => {
-      if (contact) {
-        this.dealForm.patchValue({
-          'buyerName': contact.displayName,
-          'buyerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-        });
-      }
-    });
-    contactsModal.present();
+    this.contactProvider.selectContact().then((contact) => {
+      this.dealForm.patchValue({
+        'buyerName': contact.displayName,
+        'buyerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+      });
+    }, (obj) => {
+      console.log(JSON.stringify(obj));
+      this.contactProvider.showMsg("Contact Not selected");
+    });     
   }
 
   selectSeller() {
-    let obj = {
-      'title': 'Select Seller'
-    };
-    let contactsModal = this.modalCtrl.create('ContactListPage', obj);
-    contactsModal.onDidDismiss((contact) => {
-      if (contact) {
-        this.dealForm.patchValue({
-          'sellerName': contact.displayName,
-          'sellerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-        });
-      }
-    });
-    contactsModal.present();
+    this.contactProvider.selectContact().then((contact) => {
+      this.dealForm.patchValue({
+        'sellerName': contact.displayName,
+        'sellerPhoneNumber': (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+      });
+    }, (obj) => {
+      console.log(JSON.stringify(obj));
+      this.contactProvider.showMsg("Contact Not selected");
+    });    
   }
 
   loadDatePicker(controlKey) {
-
     this.datePicker.show({
       date: new Date(),
       mode: 'date',
@@ -149,27 +139,24 @@ export class DealPage {
     });
     actionSheet.present();
   }
-
-
+  
   sendBuyer() {
     console.log(JSON.stringify(this.dealForm.value));
     var controls = this.dealForm.controls;
-    var buyerSms = ["Buyer: ", controls['buyerName'].value, ", ",
-    "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
-    "\nRate: ", "Rs ", controls['rateForBuyer'].value, "/-, ",
-    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
-    "\nDate: ", controls['date'].value, ", "];
+    var buyerSms = ["Buyer: ", controls['buyerName'].value,
+    "\nChickpeas (Kabuli) Type: ", controls['chickPeasType'].value,
+    "\nRate: ", "Rs ", controls['rateForBuyer'].value, "/-",
+    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)",
+    "\nDate: ", controls['date'].value];
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
-      buyerSms.push("\nDelivery: By " + controls['deliveryDate'].value + ", ");
+      buyerSms.push("\nDelivery: By " + controls['deliveryDate'].value);
     }
-    buyerSms.push("\nDalal: Shres Overseas, ");
-    buyerSms.push("\nRaja Agrawal, ");    
-    buyerSms.push("\nGopi Agrawal");
-
+    buyerSms.push("\nBroker: Shree Overseas\nRaja Agrawal\nGopi Agrawal");
+    
     let sms: string = buyerSms.join("");
     let alert = this.alertCtrl.create({
       title: 'Confirm SMS',
-      message: sms,
+      message: sms.replace(new RegExp('\r?\n','g'), '<br />'),
       buttons: [
         {
           text: 'Cancel',
@@ -189,21 +176,20 @@ export class DealPage {
   sendSeller() {
     console.log(JSON.stringify(this.dealForm.value));
     var controls = this.dealForm.controls;
-    var sellerSms = ["Seller: ", controls['sellerName'].value, ", ",
-    "\nChickPeas(Kabuli) Type: ", controls['chickPeasType'].value, ", ",
-    "\nRate: ", "Rs ", controls['rateForSeller'].value, "/-, ",
-    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)", ", ",
-    "\nDate: ", controls['date'].value, ", "];
+    var sellerSms = ["Seller: ", controls['sellerName'].value,,
+    "\nChickpeas (Kabuli) Type: ", controls['chickPeasType'].value,
+    "\nRate: ", "Rs ", controls['rateForSeller'].value, "/-",
+    "\nConatainers: ", controls['containerCount'].value, " (", controls['containerSize'].value, " Quintal)",
+    "\nDate: ", controls['date'].value];
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
-      sellerSms.push("\nDelivery: By " + controls['deliveryDate'].value + ", ");
+      sellerSms.push("\nDelivery: By " + controls['deliveryDate'].value);
     }
-    sellerSms.push("\nDalal: Shree Overseas, ");
-    sellerSms.push("\nRaja Agrawal, ");    
-    sellerSms.push("\nGopi Agrawal");
+    sellerSms.push("\nBroker: Shree Overseas\nRaja Agrawal\nGopi Agrawal");
+    
     let sms: string = sellerSms.join("");
     let alert = this.alertCtrl.create({
       title: 'Confirm SMS',
-      message: sms,
+      message: sms.replace(new RegExp('\r?\n','g'), '<br />'),
       buttons: [
         {
           text: 'Cancel',

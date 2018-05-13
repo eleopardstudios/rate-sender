@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { ModalController, AlertController, ActionSheetController } from 'ionic-angular';
+import { AlertController, ActionSheetController } from 'ionic-angular';
 import { FormBuilder, FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
 import { SMS } from '@ionic-native/sms';
 import { SocialSharing } from '@ionic-native/social-sharing';
@@ -22,7 +22,6 @@ export class DailyRatePage {
   public form: FormGroup;
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
-    public modalCtrl: ModalController,
     public actionSheetCtrl: ActionSheetController,
     public alertCtrl: AlertController,
     private _FB: FormBuilder,
@@ -64,23 +63,23 @@ export class DailyRatePage {
 
   sendRates(): void {
     let msgArray = [];
-    msgArray.push("ChickPeas Revised Rates");
+    msgArray.push("Chickpeas (Kabuli) Revised Rates");
     let rates = this.form.value.rates;
     rates.forEach(rate => {
       msgArray.push("\n", rate.chickPeasType, " @ ", rate.from);
       if (rate.to && rate.to != "") {
-        msgArray.push(" - ", rate.to, "/-", ", ");
+        msgArray.push(" - ", rate.to, "/-");
       } else {
-        msgArray.push("/-, ");
+        msgArray.push("/-");
       }
     });
-    msgArray.push("\nSpot Indore, \nRegards, \nShree Overseas, \n910910690, \n910910680");
+    msgArray.push("\nSpot Indore\nRegards\nShree Overseas\n910910690\n910910680");
 
     let msg: any = msgArray.join("");
 
     let alert = this.alertCtrl.create({
       title: 'Confirm SMS',
-      message: msg,
+      message: msg.replace(new RegExp('\r?\n','g'), '<br />'),
       buttons: [
         {
           text: 'Cancel',
@@ -89,7 +88,7 @@ export class DailyRatePage {
         {
           text: 'Confirm',
           handler: () => {
-            this.initActionSheet("Rate", msg)
+            this.initActionSheet("Rate", msg);
           }
         }
       ]
@@ -104,26 +103,40 @@ export class DailyRatePage {
         {
           text: 'Send Single SMS',
           handler: () => {
-            let obj = {
-              'title': 'Select Receiver'
-            };
-            let contactsModal = this.modalCtrl.create('ContactListPage', obj);
-            contactsModal.onDidDismiss((contact) => {
-              if (contact) {
-                let phoneNumber = (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
-                this.contactProvider.showLoading("Sending SMS");
-                this.sms.send(phoneNumber, msg).then(() => {
-                  this.contactProvider.hideLoading();
-                  this.contactProvider.showMsg(type + " SMS Sent");
-                }, () => {
-                  this.contactProvider.hideLoading();
-                  this.contactProvider.showMsg(type + " SMS Not Sent");
-                });               
-              } else {
-                this.contactProvider.showMsg("Contact Not selected");
-              }
+            this.contactProvider.selectContact().then((contact) => {
+              let phoneNumber = (contact.phoneNumbers[0]) ? contact.phoneNumbers[0].value : ""
+              this.contactProvider.showLoading("Sending SMS");
+              this.sms.send(phoneNumber, msg).then(() => {
+                this.contactProvider.hideLoading();
+                this.contactProvider.showMsg(type + " SMS Sent");
+              }, () => {
+                this.contactProvider.hideLoading();
+                this.contactProvider.showMsg(type + " SMS Not Sent");
+              });
+            }, (obj) => {
+              console.log(JSON.stringify(obj));
+              this.contactProvider.showMsg("Contact Not selected");
             });
-            contactsModal.present();
+          }
+        }, {
+          text: 'Send SMS to List',
+          handler: () => {
+            this.contactProvider.getContactList().then((savedContacts) => {
+              let phoneNumbers = savedContacts.map((contact) => contact.phoneNumber);
+              if (!phoneNumbers.length) {
+                this.contactProvider.showMsg("Contact List Empty");
+                return;
+              }
+              this.sms.send(phoneNumbers, msg, {
+                'android': { 'intent': 'INTENT' }
+              }).then(() => {
+              }, () => {
+                this.contactProvider.showMsg(type + " SMS Not Sent");
+              });
+            }, (obj) => {
+              console.log(JSON.stringify(obj));
+              this.contactProvider.showMsg("Contact Not selected");
+            });
           }
         }, {
           text: 'Share via WhatsApp',

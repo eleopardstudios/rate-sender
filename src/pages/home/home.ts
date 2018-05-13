@@ -30,4 +30,8 @@ export class HomePage {
     this.navCtrl.setRoot('DailyRatePage');  
   }
 
+  openContactListPage() {
+    this.navCtrl.setRoot('ContactListPage');  
+  }
+
 }

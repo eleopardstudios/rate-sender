@@ -26,7 +26,8 @@ export class MenuPage {
     this.pages = [
       { title: 'Home', component: 'HomePage' },
       { title: 'Send Deal', component: 'DealPage' },
-      { title: 'Daily Rates', component: 'DailyRatePage' }
+      { title: 'Daily Rates', component: 'DailyRatePage' },
+      { title: 'Contact List', component: 'ContactListPage' }
     ];
   }
 
