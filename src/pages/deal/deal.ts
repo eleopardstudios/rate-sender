@@ -50,7 +50,8 @@ export class DealPage {
       'containerCount': ['', Validators.required],
       'containerSize': ['240', Validators.required],
       'date': [this.datePipe.transform(new Date(), 'dd/MM/yyyy'), Validators.required],
-      'deliveryDate': ['']
+      'deliveryDate': [''],
+      'weevilCount': ['']
     });
   }
 
@@ -151,6 +152,9 @@ export class DealPage {
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
       buyerSms.push("\nDelivery: By " + controls['deliveryDate'].value);
     }
+    if(controls['weevilCount'].value && controls['weevilCount'].value != "") {
+      buyerSms.push("\nWeevil's Count: " + controls['weevilCount'].value);
+    }
     buyerSms.push("\nBroker: Shree Overseas\nRaja Agrawal\nGopi Agrawal");
     
     let sms: string = buyerSms.join("");
@@ -183,6 +187,9 @@ export class DealPage {
     "\nDate: ", controls['date'].value];
     if(controls['deliveryDate'].value && controls['deliveryDate'].value != "") {
       sellerSms.push("\nDelivery: By " + controls['deliveryDate'].value);
+    }
+    if(controls['weevilCount'].value && controls['weevilCount'].value != "") {
+      sellerSms.push("\nWeevil's Count: " + controls['weevilCount'].value);
     }
     sellerSms.push("\nBroker: Shree Overseas\nRaja Agrawal\nGopi Agrawal");
     

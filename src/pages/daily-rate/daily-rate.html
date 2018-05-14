@@ -10,6 +10,10 @@
 </ion-header>
 <ion-content padding>
   <form [formGroup]="form">
+    <ion-item margin-top>
+      <ion-label stacked>Weevil's Count</ion-label>
+      <ion-input type="number" formControlName="weevilCount"></ion-input>
+    </ion-item>
     <ion-list margin-bottom>
       <div formArrayName="rates" margin-bottom>
         <section [formGroupName]="i" *ngFor="let rate of form.controls.rates.controls; let i = index">
@@ -38,7 +42,7 @@
                 </ion-item>
               </ion-col>
               <ion-col>
-                <ion-item  no-padding>
+                <ion-item no-padding>
                   <ion-label stacked>To:</ion-label>
                   <ion-input type="number" formControlName="to"></ion-input>
                 </ion-item>

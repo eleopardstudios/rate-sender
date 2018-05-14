@@ -29,6 +29,7 @@ export class DailyRatePage {
     public sms: SMS,
     public socialSharing: SocialSharing) {
     this.form = this._FB.group({
+      weevilCount: [''],
       rates: this._FB.array([
         this.initRateFields('42/44'),
         this.initRateFields('44/46'),
@@ -63,7 +64,9 @@ export class DailyRatePage {
 
   sendRates(): void {
     let msgArray = [];
-    msgArray.push("Chickpeas (Kabuli) Revised Rates");
+    msgArray.push("HARI BOL");
+    msgArray.push("\nChickpeas (Kabuli) Revised Rates");
+    let weevilCount = this.form.value.weevilCount;
     let rates = this.form.value.rates;
     rates.forEach(rate => {
       msgArray.push("\n", rate.chickPeasType, " @ ", rate.from);
@@ -73,6 +76,9 @@ export class DailyRatePage {
         msgArray.push("/-");
       }
     });
+    if( weevilCount && weevilCount != "") {
+      msgArray.push("\n(All Counts Weevil's ", weevilCount, ")");
+    }
     msgArray.push("\nSpot Indore\nRegards\nShree Overseas\n910910690\n910910680");
 
     let msg: any = msgArray.join("");

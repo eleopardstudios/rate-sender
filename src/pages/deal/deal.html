@@ -117,18 +117,22 @@
         </ion-item>
       </ion-col>
       <ion-col col-2 no-padding align-items-center>
-          <button ion-button margin-top icon-only clear (click)="dealForm.controls['deliveryDate'].setValue('')">
-            <ion-icon name="close"></ion-icon>
-          </button>
-        </ion-col>
+        <button ion-button margin-top icon-only clear (click)="dealForm.controls['deliveryDate'].setValue('')">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </ion-col>
       <ion-col col-2 no-padding align-items-center>
         <button ion-button margin-top icon-only clear (click)="loadDatePicker('deliveryDate')">
           <ion-icon name="calendar"></ion-icon>
         </button>
       </ion-col>
-    </ion-row>  
+    </ion-row>
     <ion-item no-lines *ngIf="!dealForm.controls.deliveryDate.valid  && dealForm.controls.deliveryDate.dirty">
       <p ion-text color="danger">Please enter delivery date.</p>
+    </ion-item>
+    <ion-item margin-top>
+      <ion-label stacked>Weevil's Count</ion-label>
+      <ion-input type="number" formControlName="weevilCount"></ion-input>
     </ion-item>
     <ion-row margin-top text-center>
       <ion-col col-6>
